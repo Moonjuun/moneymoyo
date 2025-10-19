@@ -1,33 +1,33 @@
 export const Colors = {
-  // Primary
+  // Primary (메인 블루)
   primary: {
-    main: "#6366F1",
-    dark: "#4F46E5",
-    light: "#818CF8",
-    50: "#EEF2FF",
-    100: "#E0E7FF",
-    200: "#C7D2FE",
-    300: "#A5B4FC",
-    400: "#818CF8",
-    500: "#6366F1",
-    600: "#4F46E5",
-    700: "#4338CA",
-    800: "#3730A3",
-    900: "#312E81",
+    main: "#3B82F6", // 밝은 블루
+    dark: "#2563EB", // 진한 블루
+    light: "#60A5FA", // 연한 블루
+    50: "#EFF6FF",
+    100: "#DBEAFE",
+    200: "#BFDBFE",
+    300: "#93C5FD",
+    400: "#60A5FA",
+    500: "#3B82F6",
+    600: "#2563EB",
+    700: "#1D4ED8",
+    800: "#1E40AF",
+    900: "#1E3A8A",
   },
 
-  // Secondary
+  // Secondary (보조 민트/틸)
   secondary: {
-    main: "#EC4899",
-    dark: "#DB2777",
-    light: "#F472B6",
+    main: "#14B8A6", // 틸
+    dark: "#0F766E",
+    light: "#2DD4BF",
   },
 
-  // Accent
+  // Accent (포인트 오렌지)
   accent: {
-    main: "#F59E0B",
-    dark: "#D97706",
-    light: "#FBBF24",
+    main: "#F97316",
+    dark: "#EA580C",
+    light: "#FB923C",
   },
 
   // Status Colors
@@ -53,27 +53,34 @@ export const Colors = {
   },
 
   // Background
-  background: "#FFFFFF",
-  backgroundSecondary: "#F9FAFB",
-  backgroundTertiary: "#F3F4F6",
+  background: "#F8FAFC", // 연한 블루 그레이
+  backgroundSecondary: "#F1F5F9",
+  backgroundTertiary: "#E2E8F0",
 
   // Border
-  border: "#E5E7EB",
-  borderLight: "#F3F4F6",
-  borderDark: "#D1D5DB",
+  border: "#E2E8F0",
+  borderLight: "#F1F5F9",
+  borderDark: "#CBD5E1",
 
   // Text
   text: {
-    primary: "#111827",
-    secondary: "#6B7280",
-    tertiary: "#9CA3AF",
-    disabled: "#D1D5DB",
+    primary: "#0F172A",
+    secondary: "#475569",
+    tertiary: "#94A3B8",
+    disabled: "#CBD5E1",
     inverse: "#FFFFFF",
   },
 
   // Currency Colors
   currency: {
-    points: "#F59E0B",
-    tickets: "#EC4899",
+    points: "#F59E0B", // 골드
+    tickets: "#EC4899", // 핑크
+  },
+
+  // Card Colors
+  card: {
+    background: "#FFFFFF",
+    border: "#E2E8F0",
+    shadow: "rgba(59, 130, 246, 0.1)",
   },
 };
