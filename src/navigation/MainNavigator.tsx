@@ -4,28 +4,14 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "../constants/theme/colors";
 import { Fonts } from "../constants/theme/fonts";
-
+import MissionsScreen from "../screens/missions/MissionsScreen";
+import PrizesScreen from "../screens/prizes/PrizesScreen";
+import CommunityScreen from "../screens/community/CommunityScreen";
+import ProfileScreen from "../screens/profile/ProfileScreen";
 // 스크린들
 import HomeScreen from "../screens/home/HomeScreen";
 
 const Tab = createBottomTabNavigator();
-
-// 임시 스크린들 (TODO: 나중에 실제 구현)
-function MissionsScreen() {
-  return null;
-}
-
-function PrizesScreen() {
-  return null;
-}
-
-function CommunityScreen() {
-  return null;
-}
-
-function ProfileScreen() {
-  return null;
-}
 
 export default function MainNavigator() {
   return (
