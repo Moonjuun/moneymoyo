@@ -14,6 +14,9 @@ import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "../../constants/theme/colors";
 import { Fonts } from "../../constants/theme/fonts";
 import { Spacing, BorderRadius } from "../../constants/theme/spacing";
+import { useAuth } from "../../contexts/AuthContext";
+import { useMissions } from "../../hooks/useMissions";
+import { usePosts } from "../../hooks/useCommunity";
 
 const { width } = Dimensions.get("window");
 const CARD_PADDING = Spacing.lg;
@@ -21,10 +24,12 @@ const CARD_WIDTH = (width - CARD_PADDING * 3) / 2;
 
 export default function HomeScreen() {
   const navigation = useNavigation();
+  const { profile } = useAuth();
+  const { missions } = useMissions(profile?.id || null);
+  const { posts } = usePosts(undefined, 5);
 
-  // TODO: 실제 데이터로 교체 예정
-  const points = 12450;
-  const tickets = 24;
+  const points = profile?.points || 0;
+  const tickets = profile?.tickets || 0;
 
   // 미션 탭으로 이동
   const handleGoToMissions = () => {
@@ -98,30 +103,41 @@ export default function HomeScreen() {
           </View>
 
           <View style={styles.missionGrid}>
-            <MissionCard
-              iconName="play-circle"
-              title="광고 시청"
-              points={100}
-              color="#14B8A6"
-            />
-            <MissionCard
-              iconName="checkmark-circle"
-              title="출석 체크"
-              points={50}
-              color="#3B82F6"
-            />
-            <MissionCard
-              iconName="footsteps"
-              title="만보 걸기"
-              points={200}
-              color="#F59E0B"
-            />
-            <MissionCard
-              iconName="game-controller"
-              title="미니 게임"
-              points={150}
-              color="#EC4899"
-            />
+            {missions.slice(0, 4).map((mission, index) => {
+              const iconMap: { [key: string]: keyof typeof Ionicons.glyphMap } = {
+                watch_ad: "play-circle",
+                daily_attendance: "checkmark-circle",
+                referral: "people",
+                minigame_spelling: "game-controller",
+                minigame_number: "calculator",
+                minigame_color: "color-palette",
+                minigame_flag: "flag",
+                minigame_reaction: "flash",
+                minigame_decibel: "volume-high",
+              };
+
+              const colorMap: { [key: string]: string } = {
+                watch_ad: "#14B8A6",
+                daily_attendance: "#3B82F6",
+                referral: "#8B5CF6",
+                minigame_spelling: "#EC4899",
+                minigame_number: "#F59E0B",
+                minigame_color: "#10B981",
+                minigame_flag: "#EF4444",
+                minigame_reaction: "#F59E0B",
+                minigame_decibel: "#06B6D4",
+              };
+
+              return (
+                <MissionCard
+                  key={mission.id}
+                  iconName={iconMap[mission.mission_type] || "gift"}
+                  title={mission.title}
+                  points={mission.reward_amount}
+                  color={colorMap[mission.mission_type] || "#14B8A6"}
+                />
+              );
+            })}
           </View>
         </View>
         {/* 돈되는 게시판 */}
@@ -136,31 +152,25 @@ export default function HomeScreen() {
           </View>
 
           <View style={styles.postList}>
-            <PostItem
-              iconName="pricetag"
-              category="할인정보"
-              title="스타벅스 50% 할인 이벤트"
-            />
-            <PostItem
-              iconName="cash"
-              category="금융 꿀팁"
-              title="CU 편의점 2+1 상품 리스트"
-            />
-            <PostItem
-              iconName="gift"
-              category="무료행사"
-              title="이번 주 무료 나눔 이벤트"
-            />
-            <PostItem
-              iconName="card"
-              category="카드 혜택"
-              title="신한카드 7월 적립 이벤트 총정리"
-            />
-            <PostItem
-              iconName="trending-down"
-              category="절약 팁"
-              title="월 30만원 아끼는 생활비 절약법"
-            />
+            {posts.slice(0, 5).map((post) => {
+              const categoryMap: { [key: string]: { icon: keyof typeof Ionicons.glyphMap; label: string } } = {
+                savings: { icon: "trending-down", label: "절약 팁" },
+                benefits: { icon: "card", label: "혜택" },
+                free_events: { icon: "gift", label: "무료행사" },
+                general: { icon: "chatbubble", label: "일반" },
+              };
+
+              const categoryInfo = categoryMap[post.category] || categoryMap.general;
+
+              return (
+                <PostItem
+                  key={post.id}
+                  iconName={categoryInfo.icon}
+                  category={categoryInfo.label}
+                  title={post.title}
+                />
+              );
+            })}
           </View>
         </View>
       </ScrollView>

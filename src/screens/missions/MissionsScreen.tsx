@@ -13,15 +13,19 @@ import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "../../constants/theme/colors";
 import { Fonts } from "../../constants/theme/fonts";
 import { Spacing, BorderRadius } from "../../constants/theme/spacing";
+import { useAuth } from "../../contexts/AuthContext";
+import { useMissionsWithProgress } from "../../hooks/useMissions";
 
 const { width } = Dimensions.get("window");
 const CARD_PADDING = Spacing.lg;
 
 export default function MissionsScreen() {
-  // TODO: 실제 데이터로 교체 예정
-  const totalMissions = 8;
-  const completedMissions = 1;
-  const totalPoints = 980;
+  const { profile } = useAuth();
+  const { missions, loading, complete } = useMissionsWithProgress(profile?.id || null);
+
+  const totalMissions = missions.length;
+  const completedMissions = missions.filter((m) => !m.canComplete && m.daily_limit).length;
+  const totalPoints = missions.reduce((sum, m) => sum + m.reward_amount, 0);
 
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
@@ -65,66 +69,41 @@ export default function MissionsScreen() {
           </View>
 
           <View style={styles.missionList}>
-            <MissionCard
-              iconName="play-circle"
-              iconColor="#14B8A6"
-              title="광고 시청하기"
-              progress={0}
-              total={5}
-              points={100}
-              completed={false}
-            />
-            <MissionCard
-              iconName="checkmark-circle"
-              iconColor="#10B981"
-              title="출석 체크"
-              completed={true}
-            />
-            <MissionCard
-              iconName="footsteps"
-              iconColor="#F59E0B"
-              title="만보 걷기"
-              progress={5432}
-              total={10000}
-              points={200}
-              showProgressBar
-            />
-            <MissionCard
-              iconName="time"
-              iconColor="#3B82F6"
-              title="앱 접속 유지 30분"
-              progress={15}
-              total={30}
-              points={80}
-              showProgressBar
-            />
+            {missions
+              .filter((m) =>
+                m.mission_type === "daily_attendance" ||
+                m.mission_type === "watch_ad" ||
+                m.mission_type === "referral"
+              )
+              .map((mission) => {
+                const iconMap: { [key: string]: keyof typeof Ionicons.glyphMap } = {
+                  watch_ad: "play-circle",
+                  daily_attendance: "checkmark-circle",
+                  referral: "people",
+                };
+
+                const colorMap: { [key: string]: string } = {
+                  watch_ad: "#14B8A6",
+                  daily_attendance: "#10B981",
+                  referral: "#8B5CF6",
+                };
+
+                return (
+                  <MissionCard
+                    key={mission.id}
+                    iconName={iconMap[mission.mission_type] || "gift"}
+                    iconColor={colorMap[mission.mission_type] || "#14B8A6"}
+                    title={mission.title}
+                    progress={mission.todayCompletionCount}
+                    total={mission.daily_limit || undefined}
+                    points={mission.reward_amount}
+                    completed={!mission.canComplete && !!mission.daily_limit}
+                  />
+                );
+              })}
           </View>
         </View>
 
-        {/* 금융 미션 */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <View style={styles.sectionIndicator} />
-            <Text style={styles.sectionTitle}>금융 미션</Text>
-          </View>
-
-          <View style={styles.missionList}>
-            <MissionCard
-              iconName="help-circle"
-              iconColor="#EC4899"
-              title="금융 퀴즈 참여"
-              progress={0}
-              total={3}
-              points={150}
-            />
-            <MissionCard
-              iconName="stats-chart"
-              iconColor="#8B5CF6"
-              title="금융 상품 비교하기"
-              points={200}
-            />
-          </View>
-        </View>
 
         {/* 게임 미션 */}
         <View style={styles.section}>
@@ -134,22 +113,40 @@ export default function MissionsScreen() {
           </View>
 
           <View style={styles.missionList}>
-            <MissionCard
-              iconName="game-controller"
-              iconColor="#F59E0B"
-              title="맞춤법 게임 플레이"
-              progress={0}
-              total={1}
-              points={100}
-            />
-            <MissionCard
-              iconName="flash"
-              iconColor="#EF4444"
-              title="반응속도 게임 플레이"
-              progress={0}
-              total={1}
-              points={150}
-            />
+            {missions
+              .filter((m) => m.mission_type.startsWith("minigame_"))
+              .map((mission) => {
+                const iconMap: { [key: string]: keyof typeof Ionicons.glyphMap } = {
+                  minigame_spelling: "game-controller",
+                  minigame_number: "calculator",
+                  minigame_color: "color-palette",
+                  minigame_flag: "flag",
+                  minigame_reaction: "flash",
+                  minigame_decibel: "volume-high",
+                };
+
+                const colorMap: { [key: string]: string } = {
+                  minigame_spelling: "#F59E0B",
+                  minigame_number: "#3B82F6",
+                  minigame_color: "#10B981",
+                  minigame_flag: "#EF4444",
+                  minigame_reaction: "#EC4899",
+                  minigame_decibel: "#06B6D4",
+                };
+
+                return (
+                  <MissionCard
+                    key={mission.id}
+                    iconName={iconMap[mission.mission_type] || "game-controller"}
+                    iconColor={colorMap[mission.mission_type] || "#F59E0B"}
+                    title={mission.title}
+                    progress={mission.todayCompletionCount}
+                    total={mission.daily_limit || undefined}
+                    points={mission.reward_amount}
+                    completed={!mission.canComplete && !!mission.daily_limit}
+                  />
+                );
+              })}
           </View>
         </View>
 

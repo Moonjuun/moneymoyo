@@ -13,23 +13,46 @@ import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "../../constants/theme/colors";
 import { Fonts } from "../../constants/theme/fonts";
 import { Spacing, BorderRadius } from "../../constants/theme/spacing";
+import { usePosts, PostCategory } from "../../hooks/useCommunity";
 
 const { width } = Dimensions.get("window");
 const CARD_PADDING = Spacing.lg;
 
-// 카테고리 타입
-type Category = "전체" | "할인정보" | "혜택" | "금융 꿀팁" | "후기";
+// 시간 차이 계산 함수
+function getTimeAgo(dateString: string): string {
+  const now = new Date();
+  const past = new Date(dateString);
+  const diffInMs = now.getTime() - past.getTime();
+  const diffInMinutes = Math.floor(diffInMs / 60000);
+  const diffInHours = Math.floor(diffInMinutes / 60);
+  const diffInDays = Math.floor(diffInHours / 24);
+
+  if (diffInMinutes < 1) return "방금 전";
+  if (diffInMinutes < 60) return `${diffInMinutes}분 전`;
+  if (diffInHours < 24) return `${diffInHours}시간 전`;
+  if (diffInDays < 7) return `${diffInDays}일 전`;
+  return past.toLocaleDateString("ko-KR");
+}
 
 export default function CommunityScreen() {
-  const [selectedCategory, setSelectedCategory] = useState<Category>("전체");
+  const [selectedCategory, setSelectedCategory] = useState<PostCategory | "전체">("전체");
+  const { posts } = usePosts(selectedCategory === "전체" ? undefined : selectedCategory);
 
-  const categories: Category[] = [
+  const categories: (PostCategory | "전체")[] = [
     "전체",
-    "할인정보",
-    "혜택",
-    "금융 꿀팁",
-    "후기",
+    "savings",
+    "benefits",
+    "free_events",
+    "general",
   ];
+
+  const categoryLabels: { [key: string]: string } = {
+    전체: "전체",
+    savings: "절약 팁",
+    benefits: "혜택",
+    free_events: "무료행사",
+    general: "일반",
+  };
 
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
@@ -61,7 +84,7 @@ export default function CommunityScreen() {
                   selectedCategory === category && styles.categoryTextActive,
                 ]}
               >
-                {category}
+                {categoryLabels[category] || category}
               </Text>
             </TouchableOpacity>
           ))}
@@ -74,66 +97,30 @@ export default function CommunityScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <PostCard
-          category="할인정보"
-          categoryColor="#14B8A6"
-          title="스타벅스 50% 할인 이벤트 놓치지 마세요"
-          content="이번 주말까지 스타벅스 전 메뉴 50% 할인대요! 놓치면 후회할 듯..."
-          author="절약왕"
-          likes={234}
-          comments={45}
-          timeAgo="2시간 전"
-        />
-        <PostCard
-          category="금융 꿀팁"
-          categoryColor="#3B82F6"
-          title="적금 이자 비교해봤습니다"
-          content="요즘 금리 좋은 적금 상품들 정리해봤어요. 제 1금융권 중심으로..."
-          author="재테크왕"
-          likes={156}
-          comments={28}
-          timeAgo="5시간 전"
-        />
-        <PostCard
-          category="혜택"
-          categoryColor="#F59E0B"
-          title="머니모여 신규 가입 혜택 받는 법"
-          content="친구 초대하면 둘 다 1000포인트 받아요! 코드 공유합니다"
-          author="money123"
-          likes={89}
-          comments={12}
-          timeAgo="1일 전"
-        />
-        <PostCard
-          category="후기"
-          categoryColor="#EC4899"
-          title="만보 걷기 미션 드디어 성공!"
-          content="매일 꾸준히 걸었더니 포인트가 모이고 건강도 좋아진 것 같아요"
-          author="건강러버"
-          likes={67}
-          comments={8}
-          timeAgo="1일 전"
-        />
-        <PostCard
-          category="할인정보"
-          categoryColor="#14B8A6"
-          title="편의점 2+1 행사 총정리"
-          content="CU, GS25, 세븐일레븐 이번 주 행사 상품 모았어요"
-          author="편의점마스터"
-          likes={198}
-          comments={32}
-          timeAgo="2일 전"
-        />
-        <PostCard
-          category="금융 꿀팁"
-          categoryColor="#3B82F6"
-          title="청년 지원금 신청 방법 정리"
-          content="2025년 청년지원금 신청 기간과 방법 상세히 정리했습니다"
-          author="청년파이팅"
-          likes={312}
-          comments={54}
-          timeAgo="3일 전"
-        />
+        {posts.map((post) => {
+          const categoryColorMap: { [key: string]: string } = {
+            savings: "#14B8A6",
+            benefits: "#F59E0B",
+            free_events: "#EC4899",
+            general: "#3B82F6",
+          };
+
+          const timeAgo = getTimeAgo(post.created_at);
+
+          return (
+            <PostCard
+              key={post.id}
+              category={categoryLabels[post.category] || post.category}
+              categoryColor={categoryColorMap[post.category] || "#3B82F6"}
+              title={post.title}
+              content={post.content}
+              author={post.author.username}
+              likes={post.like_count}
+              comments={post.comment_count}
+              timeAgo={timeAgo}
+            />
+          );
+        })}
 
         {/* 하단 여백 */}
         <View style={styles.bottomSpacer} />
