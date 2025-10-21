@@ -13,15 +13,23 @@ import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "../../constants/theme/colors";
 import { Fonts } from "../../constants/theme/fonts";
 import { Spacing, BorderRadius } from "../../constants/theme/spacing";
+import { useAuth } from "../../contexts/AuthContext";
+import { usePrizesWithPity, usePrizeEntries } from "../../hooks/usePrizes";
 
 const { width } = Dimensions.get("window");
 const CARD_PADDING = Spacing.lg;
 
 export default function PrizesScreen() {
-  // TODO: 실제 데이터로 교체 예정
-  const tickets = 24;
-  const ceilingProgress = 75; // 천장 진행도
-  const ceilingTotal = 100; // 천장 총 개수
+  const { profile } = useAuth();
+  const { prizes } = usePrizesWithPity(profile?.id || null);
+  const { entries } = usePrizeEntries(profile?.id || null);
+
+  const tickets = profile?.tickets || 0;
+
+  // 첫 번째 경품의 천장 정보 (예시)
+  const mainPrize = prizes[0];
+  const ceilingProgress = mainPrize?.pityCount || 0;
+  const ceilingTotal = mainPrize?.pity_threshold || 100;
   const ceilingPercentage = (ceilingProgress / ceilingTotal) * 100;
 
   return (
@@ -77,34 +85,19 @@ export default function PrizesScreen() {
           </View>
 
           <View style={styles.prizeList}>
-            <PrizeCard
-              title="아이폰 15 Pro"
-              description="응모권 100장 필요"
-              ticketsRequired={100}
-              iconColor="#14B8A6"
-              onPress={() => console.log("응모하기")}
-            />
-            <PrizeCard
-              title="스타벅스 기프티콘"
-              description="응모권 10장 필요"
-              ticketsRequired={10}
-              iconColor="#F59E0B"
-              onPress={() => console.log("응모하기")}
-            />
-            <PrizeCard
-              title="5만원 상품권"
-              description="응모권 50장 필요"
-              ticketsRequired={50}
-              iconColor="#3B82F6"
-              onPress={() => console.log("응모하기")}
-            />
-            <PrizeCard
-              title="넷플릭스 3개월 이용권"
-              description="응모권 30장 필요"
-              ticketsRequired={30}
-              iconColor="#EF4444"
-              onPress={() => console.log("응모하기")}
-            />
+            {prizes.map((prize, index) => {
+              const colors = ["#14B8A6", "#F59E0B", "#3B82F6", "#EF4444", "#10B981", "#EC4899"];
+              return (
+                <PrizeCard
+                  key={prize.id}
+                  title={prize.name}
+                  description={`응모권 ${prize.tickets_per_entry}장 필요`}
+                  ticketsRequired={prize.tickets_per_entry}
+                  iconColor={colors[index % colors.length]}
+                  onPress={() => console.log("응모하기:", prize.name)}
+                />
+              );
+            })}
           </View>
         </View>
 
@@ -115,17 +108,14 @@ export default function PrizesScreen() {
           </View>
 
           <View style={styles.historyList}>
-            <HistoryCard
-              title="아이폰 15 Pro"
-              date="2025.10.15"
-              status="pending"
-            />
-            <HistoryCard
-              title="스타벅스 기프티콘"
-              date="2025.10.10"
-              status="lost"
-            />
-            <HistoryCard title="5만원 상품권" date="2025.10.05" status="lost" />
+            {entries.slice(0, 10).map((entry) => (
+              <HistoryCard
+                key={entry.id}
+                title={entry.prizes?.name || "알 수 없는 경품"}
+                date={new Date(entry.created_at).toLocaleDateString("ko-KR")}
+                status="pending"
+              />
+            ))}
           </View>
         </View>
 
