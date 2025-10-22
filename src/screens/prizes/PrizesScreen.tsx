@@ -20,9 +20,9 @@ const { width } = Dimensions.get("window");
 const CARD_PADDING = Spacing.lg;
 
 export default function PrizesScreen() {
-  const { profile } = useAuth();
-  const { prizes } = usePrizesWithPity(profile?.id || null);
-  const { entries } = usePrizeEntries(profile?.id || null);
+  const { user, profile } = useAuth();
+  const { prizes } = usePrizesWithPity(user?.id || null);
+  const { entries } = usePrizeEntries(user?.id || null);
 
   const tickets = profile?.tickets || 0;
 

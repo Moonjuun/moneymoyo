@@ -78,17 +78,24 @@ export function usePrizesWithPity(userId: string | null) {
   const [error, setError] = useState<Error | null>(null);
 
   const loadPrizes = async () => {
-    if (!userId) {
-      setPrizes([]);
-      setLoading(false);
-      return;
-    }
-
     try {
       setLoading(true);
       setError(null);
-      const data = await getPrizesWithPity(userId);
-      setPrizes(data);
+
+      if (!userId) {
+        // userId가 없으면 pity 정보 없이 경품 목록만 가져옴
+        const basicPrizes = await getActivePrizes();
+        const prizesWithDefaultPity: PrizeWithPity[] = basicPrizes.map(prize => ({
+          ...prize,
+          pityCount: 0,
+          pityPercentage: 0,
+        }));
+        setPrizes(prizesWithDefaultPity);
+      } else {
+        // userId가 있으면 pity 정보와 함께 가져옴
+        const data = await getPrizesWithPity(userId);
+        setPrizes(data);
+      }
     } catch (err) {
       setError(err as Error);
     } finally {
