@@ -24,8 +24,8 @@ const CARD_WIDTH = (width - CARD_PADDING * 3) / 2;
 
 export default function HomeScreen() {
   const navigation = useNavigation();
-  const { profile } = useAuth();
-  const { missions } = useMissions(profile?.id || null);
+  const { user, profile } = useAuth();
+  const { missions } = useMissions(user?.id || null);
   const { posts } = usePosts(undefined, 5);
 
   const points = profile?.points || 0;

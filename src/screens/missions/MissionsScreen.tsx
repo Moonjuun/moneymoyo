@@ -20,8 +20,8 @@ const { width } = Dimensions.get("window");
 const CARD_PADDING = Spacing.lg;
 
 export default function MissionsScreen() {
-  const { profile } = useAuth();
-  const { missions, loading, complete } = useMissionsWithProgress(profile?.id || null);
+  const { user, profile } = useAuth();
+  const { missions, loading, complete } = useMissionsWithProgress(user?.id || null);
 
   const totalMissions = missions.length;
   const completedMissions = missions.filter((m) => !m.canComplete && m.daily_limit).length;

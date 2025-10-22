@@ -18,12 +18,6 @@ export function useMissions(userId: string | null) {
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    if (!userId) {
-      setMissions([]);
-      setLoading(false);
-      return;
-    }
-
     let isMounted = true;
 
     async function loadMissions() {
@@ -53,8 +47,6 @@ export function useMissions(userId: string | null) {
   }, [userId]);
 
   const refresh = async () => {
-    if (!userId) return;
-
     try {
       setLoading(true);
       setError(null);
