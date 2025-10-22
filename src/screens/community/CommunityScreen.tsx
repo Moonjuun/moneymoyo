@@ -13,7 +13,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "../../constants/theme/colors";
 import { Fonts } from "../../constants/theme/fonts";
 import { Spacing, BorderRadius } from "../../constants/theme/spacing";
-import { usePosts, PostCategory } from "../../hooks/useCommunity";
+import { usePosts } from "../../hooks/useCommunity";
+import { PostCategory } from "../../services/community";
 
 const { width } = Dimensions.get("window");
 const CARD_PADDING = Spacing.lg;
@@ -35,8 +36,12 @@ function getTimeAgo(dateString: string): string {
 }
 
 export default function CommunityScreen() {
-  const [selectedCategory, setSelectedCategory] = useState<PostCategory | "전체">("전체");
-  const { posts } = usePosts(selectedCategory === "전체" ? undefined : selectedCategory);
+  const [selectedCategory, setSelectedCategory] = useState<
+    PostCategory | "전체"
+  >("전체");
+  const { posts } = usePosts(
+    selectedCategory === "전체" ? undefined : selectedCategory
+  );
 
   const categories: (PostCategory | "전체")[] = [
     "전체",

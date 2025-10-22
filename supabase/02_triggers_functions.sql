@@ -16,56 +16,66 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- 기존 트리거 삭제 후 재생성
+
 -- Profiles 테이블
+DROP TRIGGER IF EXISTS update_profiles_updated_at ON public.profiles;
 CREATE TRIGGER update_profiles_updated_at
     BEFORE UPDATE ON public.profiles
     FOR EACH ROW
     EXECUTE FUNCTION public.update_updated_at_column();
 
 -- Missions 테이블
+DROP TRIGGER IF EXISTS update_missions_updated_at ON public.missions;
 CREATE TRIGGER update_missions_updated_at
     BEFORE UPDATE ON public.missions
     FOR EACH ROW
     EXECUTE FUNCTION public.update_updated_at_column();
 
 -- Posts 테이블
+DROP TRIGGER IF EXISTS update_posts_updated_at ON public.posts;
 CREATE TRIGGER update_posts_updated_at
     BEFORE UPDATE ON public.posts
     FOR EACH ROW
     EXECUTE FUNCTION public.update_updated_at_column();
 
 -- Comments 테이블
+DROP TRIGGER IF EXISTS update_comments_updated_at ON public.comments;
 CREATE TRIGGER update_comments_updated_at
     BEFORE UPDATE ON public.comments
     FOR EACH ROW
     EXECUTE FUNCTION public.update_updated_at_column();
 
 -- Prizes 테이블
+DROP TRIGGER IF EXISTS update_prizes_updated_at ON public.prizes;
 CREATE TRIGGER update_prizes_updated_at
     BEFORE UPDATE ON public.prizes
     FOR EACH ROW
     EXECUTE FUNCTION public.update_updated_at_column();
 
 -- Reward Products 테이블
+DROP TRIGGER IF EXISTS update_reward_products_updated_at ON public.reward_products;
 CREATE TRIGGER update_reward_products_updated_at
     BEFORE UPDATE ON public.reward_products
     FOR EACH ROW
     EXECUTE FUNCTION public.update_updated_at_column();
 
 -- Withdrawal Requests 테이블
+DROP TRIGGER IF EXISTS update_withdrawal_requests_updated_at ON public.withdrawal_requests;
 CREATE TRIGGER update_withdrawal_requests_updated_at
     BEFORE UPDATE ON public.withdrawal_requests
     FOR EACH ROW
     EXECUTE FUNCTION public.update_updated_at_column();
 
 -- Prize Pity Counters 테이블
+DROP TRIGGER IF EXISTS update_prize_pity_counters_updated_at ON public.prize_pity_counters;
 CREATE TRIGGER update_prize_pity_counters_updated_at
     BEFORE UPDATE ON public.prize_pity_counters
     FOR EACH ROW
     EXECUTE FUNCTION public.update_updated_at_column();
 
 -- ============================================================================
--- 2. 추천 코드 생성 함수 (이미 정의되어 있음)
+-- 2. 추천 코드 생성 함수
 -- ============================================================================
 
 CREATE OR REPLACE FUNCTION public.generate_referral_code()
@@ -89,7 +99,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- ============================================================================
--- 3. 신규 사용자 프로필 자동 생성 트리거 (선택사항)
+-- 3. 신규 사용자 프로필 자동 생성 트리거
 -- ============================================================================
 
 CREATE OR REPLACE FUNCTION public.handle_new_user()
@@ -127,6 +137,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS on_comment_created ON public.comments;
 CREATE TRIGGER on_comment_created
     AFTER INSERT ON public.comments
     FOR EACH ROW
@@ -145,6 +156,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS on_comment_deleted ON public.comments;
 CREATE TRIGGER on_comment_deleted
     AFTER UPDATE ON public.comments
     FOR EACH ROW

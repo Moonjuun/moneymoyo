@@ -5,6 +5,9 @@ export type Prize = Tables<"prizes">;
 export type PrizeEntry = Tables<"prize_entries">;
 export type PrizeEntryInsert = TablesInsert<"prize_entries">;
 export type PrizePityCounter = Tables<"prize_pity_counters">;
+export interface PrizeEntryWithPrize extends PrizeEntry {
+  prizes: Prize | null;
+}
 
 /**
  * 활성화된 경품 목록 조회 (display_order 순)
@@ -39,7 +42,8 @@ export async function getPrize(prizeId: string): Promise<Prize> {
  */
 export async function getUserPrizeEntries(
   userId: string
-): Promise<PrizeEntry[]> {
+): Promise<PrizeEntryWithPrize[]> {
+  // ✅ 반환 타입 변경
   const { data, error } = await supabase
     .from("prize_entries")
     .select("*, prizes(*)")
@@ -47,15 +51,13 @@ export async function getUserPrizeEntries(
     .order("created_at", { ascending: false });
 
   if (error) throw error;
-  return data || [];
+  return (data || []) as PrizeEntryWithPrize[]; // ✅ 타입 단언 추가
 }
 
 /**
  * 경품 응모하기
  */
-export async function enterPrize(
-  entry: PrizeEntryInsert
-): Promise<PrizeEntry> {
+export async function enterPrize(entry: PrizeEntryInsert): Promise<PrizeEntry> {
   const { data, error } = await supabase
     .from("prize_entries")
     .insert(entry)

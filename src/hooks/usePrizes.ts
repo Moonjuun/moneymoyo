@@ -8,6 +8,7 @@ import {
   PrizeWithPity,
   PrizeEntry,
   PrizeEntryInsert,
+  PrizeEntryWithPrize,
 } from "../services/prizes";
 
 /**
@@ -125,7 +126,7 @@ export function usePrizesWithPity(userId: string | null) {
  * 사용자의 경품 응모 내역을 관리하는 훅
  */
 export function usePrizeEntries(userId: string | null) {
-  const [entries, setEntries] = useState<PrizeEntry[]>([]);
+  const [entries, setEntries] = useState<PrizeEntryWithPrize[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 

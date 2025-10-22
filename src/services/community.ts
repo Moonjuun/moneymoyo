@@ -1,5 +1,10 @@
 import { supabase } from "../lib/supabase";
-import { Tables, TablesInsert, TablesUpdate, Enums } from "../lib/database.types";
+import {
+  Tables,
+  TablesInsert,
+  TablesUpdate,
+  Enums,
+} from "../lib/database.types";
 
 export type Post = Tables<"posts">;
 export type PostInsert = TablesInsert<"posts">;
@@ -129,23 +134,16 @@ export async function deletePost(postId: string): Promise<void> {
  * 게시글 조회수 증가
  */
 export async function incrementViewCount(postId: string): Promise<void> {
-  const { error } = await supabase.rpc("increment", {
-    table_name: "posts",
-    row_id: postId,
-    column_name: "view_count",
-  });
-
-  // rpc 함수가 없으면 직접 증가
-  if (error) {
-    const post = await getPost(postId);
-    await updatePost(postId, { view_count: post.view_count + 1 });
-  }
+  const post = await getPost(postId);
+  await updatePost(postId, { view_count: post.view_count + 1 });
 }
 
 /**
  * 게시글의 댓글 목록 조회
  */
-export async function getComments(postId: string): Promise<CommentWithAuthor[]> {
+export async function getComments(
+  postId: string
+): Promise<CommentWithAuthor[]> {
   const { data, error } = await supabase
     .from("comments")
     .select(
@@ -242,5 +240,7 @@ async function incrementCommentCount(postId: string): Promise<void> {
  */
 async function decrementCommentCount(postId: string): Promise<void> {
   const post = await getPost(postId);
-  await updatePost(postId, { comment_count: Math.max(0, post.comment_count - 1) });
+  await updatePost(postId, {
+    comment_count: Math.max(0, post.comment_count - 1),
+  });
 }
